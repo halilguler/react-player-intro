@@ -10,6 +10,7 @@ interface PlayingBackRateProps {
     event: React.ChangeEvent<{ value: number }>
   ) => void;
   playBackRateRef: React.RefObject<HTMLDivElement>;
+  setIsHandlerMouse: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const IconButtonStyled = styled(IconButton)`
@@ -46,7 +47,7 @@ const marks = [
 ];
 
 const PlayingBackRate = (props: PlayingBackRateProps) => {
-  const { playbackRate, handlePlaybackRateChange } = props;
+  const { playbackRate, handlePlaybackRateChange, setIsHandlerMouse } = props;
   const [value, setValue] = React.useState<number>(playbackRate);
   const [visible, setVisible] = React.useState<boolean>(false);
   const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -69,6 +70,14 @@ const PlayingBackRate = (props: PlayingBackRateProps) => {
             alignItems: "center",
             position: "relative",
             left: "unset",
+          }}
+          onMouseMove={(event: any) => {
+            event.stopPropagation();
+            setIsHandlerMouse(true);
+          }}
+          onMouseLeave={(event: any) => {
+            event.stopPropagation();
+            setIsHandlerMouse(false);
           }}
         >
           <Box
@@ -102,9 +111,17 @@ const PlayingBackRate = (props: PlayingBackRateProps) => {
       )}
 
       <IconButtonStyled
-        onClick={handlePopoverOpen}
+        onClick={(event: any) => {
+          event.stopPropagation();
+          setIsHandlerMouse(true);
+          handlePopoverOpen(event);
+        }}
         size="small"
-        // onMouseEnter={handlePopoverOpen}
+        // onMouseEnter={(event: any) => {
+        //   event.stopPropagation();
+        //   setIsHandlerMouse(true);
+        //   handlePopoverOpen(event);
+        // }}
         sx={{ ml: 2 }}
       >
         <Speed />

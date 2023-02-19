@@ -73,6 +73,7 @@ const App: React.FC<VideoPlayerProps> = ({ url, light }) => {
   const [trackLang, setTrackLang] = useState("it");
   const [playbackRate, setPlaybackRate] = useState<number>(1);
   const [showControls, setShowControls] = useState<boolean>(false);
+  const [isHandlerMouse, setIsHandlerMouse] = useState<boolean>(false);
 
   const config = {
     file: {
@@ -118,6 +119,10 @@ const App: React.FC<VideoPlayerProps> = ({ url, light }) => {
     };
   }, [isDragging]);
 
+  useEffect(() => {
+    handleClearTimeout();
+  }, [isHandlerMouse]);
+
   const handleMouseMove = () => {
     setShowControls(true);
     document.body.style.cursor = "auto";
@@ -127,6 +132,10 @@ const App: React.FC<VideoPlayerProps> = ({ url, light }) => {
       setShowControls(false);
       document.body.style.cursor = "none";
     }, 3000);
+  };
+
+  const handleClearTimeout = () => {
+    clearTimeout(timeoutRef.current);
   };
 
   const handleMouseLeave = () => {
@@ -177,7 +186,24 @@ const App: React.FC<VideoPlayerProps> = ({ url, light }) => {
   return (
     <div>
       <StyledPlayer ref={wrapperRef}>
-        <div onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+        <div
+          onMouseMove={() => {
+            if (!isHandlerMouse) {
+              handleMouseMove();
+            } else {
+              handleClearTimeout();
+              setIsHandlerMouse(false);
+            }
+          }}
+          onMouseLeave={() => {
+            if (!isHandlerMouse) {
+              handleMouseLeave();
+            } else {
+              handleClearTimeout();
+              setIsHandlerMouse(false);
+            }
+          }}
+        >
           <ReactPlayer
             ref={playerRef}
             url={url}
@@ -272,6 +298,7 @@ const App: React.FC<VideoPlayerProps> = ({ url, light }) => {
                       playbackRate={playbackRate}
                       handlePlaybackRateChange={handlePlaybackRateChange}
                       playBackRateRef={wrapperRef}
+                      setIsHandlerMouse={setIsHandlerMouse}
                     />
                     <FullScreen wrapperRef={wrapperRef} />
                   </div>
